@@ -37,6 +37,8 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>`
             : `<p><em>No participants yet</em></p>`;
 
+        // Move the registration form functionality to each activity card
+        // Add a "Register Student" button to each activity card
         activityCard.innerHTML = `
           <h4>${name}</h4>
           <p>${details.description}</p>
@@ -45,6 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="participants-container">
             ${participantsHTML}
           </div>
+          <button class="register-btn" data-activity="${name}">Register Student</button>
         `;
 
         activitiesList.appendChild(activityCard);
@@ -54,6 +57,14 @@ document.addEventListener("DOMContentLoaded", () => {
         option.value = name;
         option.textContent = name;
         activitySelect.appendChild(option);
+
+        // Add event listener for the new "Register Student" button
+        activityCard.querySelector(".register-btn").addEventListener("click", () => {
+          const email = prompt("Enter student email:");
+          if (email) {
+            handleRegister(name, email);
+          }
+        });
       });
 
       // Add event listeners to delete buttons
@@ -110,13 +121,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Handle form submission
-  signupForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    const email = document.getElementById("email").value;
-    const activity = document.getElementById("activity").value;
-
+  // Handle register functionality
+  async function handleRegister(activity, email) {
     try {
       const response = await fetch(
         `/activities/${encodeURIComponent(
@@ -132,7 +138,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (response.ok) {
         messageDiv.textContent = result.message;
         messageDiv.className = "success";
-        signupForm.reset();
 
         // Refresh activities list to show updated participants
         fetchActivities();
@@ -153,7 +158,7 @@ document.addEventListener("DOMContentLoaded", () => {
       messageDiv.classList.remove("hidden");
       console.error("Error signing up:", error);
     }
-  });
+  }
 
   // Initialize app
   fetchActivities();
